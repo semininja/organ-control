@@ -3,10 +3,12 @@
 import midi
 import sys
 import spidev
+import time as t
 
 '''import and convert file to absolute time'''
 midifile = sys.argv[1]
 pattern = midi.read_midifile(midifile)
+#absolute tick counts allow global sorting by time
 pattern.make_ticks_abs()
 
 '''combine all parts'''
@@ -14,7 +16,7 @@ single_track = midi.Track()
 for track in pattern:
     for event in track:
         single_track.append(event)
-
+#aforementioned global sort
 single_track.sort(key=lambda note: note.tick)
 
 '''reorganize as notes on at x time in microseconds'''
@@ -57,12 +59,32 @@ for event in single_track:
         scroll_dict[running_time] = tuple(set(notes_on))
 
 '''assemble 'piano roll' in preparation for output to horns'''
-scroll=[]
+scroll = []
+registers = []
+running_time = 0
 for time in sorted(scroll_dict.keys()):
-    scroll.append((time, sorted(scroll_dict[time])))
+    #convert back to relative time
+    time -= running_time
+    running_time += time
 
+    #reset all registers
+    for i in range(8):
+        registers[i] = 0b0
+
+    #set active notes
+    for note in scroll_dict[time]:
+        reg_num = note // 8
+        reg_bit = note % 8
+        registers[reg_num] += 2^reg_bit
+
+    scroll.append((time, registers))
+
+'''play scroll'''
 spi = spidev.SpiDev()
 spi.open(0, 0)
 spi.max_speed_hz = int(5E6)
 #send notes
+for time, registers in scroll:
+    t.sleep(time)
+    spi.xfer2(registers)
 spi.close()
