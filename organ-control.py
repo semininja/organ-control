@@ -60,7 +60,7 @@ for event in single_track:
 
 '''assemble 'piano roll' in preparation for output to horns'''
 scroll = []
-registers = []
+registers = list(range(8))
 running_time = 0
 for time in sorted(scroll_dict.keys()):
     #convert back to relative time
