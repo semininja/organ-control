@@ -84,6 +84,6 @@ spi.open(0, 0)
 spi.max_speed_hz = int(5E6)
 #send notes
 for time, registers in scroll:
-    t.sleep(time)
+    t.sleep(time*1E-6)
     spi.xfer2(registers)
 spi.close()
