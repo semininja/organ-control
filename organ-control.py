@@ -34,7 +34,7 @@ for event in single_track:
         for i, val in enumerate(event.data):
             uspb += val * 256**(2-i)
         uspt = int(uspb/tpb)
-
+    
     '''add/remove notes at given time'''
     elif isinstance(event, midi.NoteOnEvent):
         event.tick -= running_tick
@@ -66,17 +66,17 @@ for time in sorted(scroll_dict.keys()):
     #convert back to relative time
     time -= running_time
     running_time += time
-
+    
     #reset all registers
     for i in range(8):
         registers[i] = 0b0
-
+    
     #set active notes
     for note in scroll_dict[time]:
         reg_num = note // 8
         reg_bit = note % 8
         registers[reg_num] += 2^reg_bit
-
+    
     scroll.append((time, registers))
 
 '''play scroll'''
