@@ -2,7 +2,7 @@
 
 import midi
 import sys
-#import spidev
+import spidev
 
 '''import and convert file to absolute time'''
 midifile = sys.argv[1]
@@ -17,7 +17,7 @@ for track in pattern:
 
 single_track.sort(key=lambda note: note.tick)
 
-'''reorganize as notes on at x time in usec'''
+'''reorganize as notes on at x time in microseconds'''
 notes_on = []
 scroll_dict = {}
 uspb = 50000 #microseconds per beat, default (120 bpm)
@@ -25,7 +25,7 @@ tpb = pattern.resolution
 running_tick = 0
 running_time = 0
 for event in single_track:
-    #set tempo for section
+    '''set tempo for section'''
     if isinstance(event, midi.SetTempoEvent):
         uspb = 0
         #data is saved in decimal equivalent of hex pairs
@@ -33,13 +33,17 @@ for event in single_track:
             uspb += val * 256**(2-i)
         uspt = int(uspb/tpb)
 
-    #add/remove notes at given time
+    '''add/remove notes at given time'''
     elif isinstance(event, midi.NoteOnEvent):
         event.tick -= running_tick
         running_tick += event.tick
         running_time += event.tick*uspt
+
+        #converts from MIDI pitch to solenoid number
+        note_id = event.data[0] - 24
+
         if 128 > event.data[1] > 0:
-            #permits duplicates to avoid premature cancellation
+            #allows duplicates to prevent
             notes_on.append((event.data[0]))
         elif event.data[1] == 0:
             if event.data[0] in notes_on:
