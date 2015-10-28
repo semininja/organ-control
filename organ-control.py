@@ -62,10 +62,6 @@ scroll = []
 registers = list(range(8))
 running_time = 0
 for time in sorted(scroll_dict.keys()):
-    #convert back to relative time
-    time -= running_time
-    running_time += time
-
     #reset all registers
     for i in range(8):
         registers[i] = 0b0
@@ -75,6 +71,10 @@ for time in sorted(scroll_dict.keys()):
         reg_num = note // 8
         reg_bit = note % 8
         registers[reg_num] += 2^reg_bit
+
+    #convert back to relative time
+    time -= running_time
+    running_time += time
 
     scroll.append((time, registers))
 
