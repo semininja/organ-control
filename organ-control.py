@@ -27,15 +27,14 @@ tpb = pattern.resolution
 running_tick = 0
 running_time = 0
 for event in single_track:
-    '''set tempo for section'''
+    #set tempo for section
     if isinstance(event, midi.SetTempoEvent):
         uspb = 0
         #data is saved in decimal equivalent of hex pairs
         for i, val in enumerate(event.data):
             uspb += val * 256**(2-i)
         uspt = int(uspb/tpb)
-    
-    '''add/remove notes at given time'''
+    #add/remove notes at given time
     elif isinstance(event, midi.NoteOnEvent):
         event.tick -= running_tick
         running_tick += event.tick
@@ -46,14 +45,14 @@ for event in single_track:
 
         if 128 > event.data[1] > 0:
             #allows duplicates to prevent premature note cancellation
-            notes_on.append((event.data[0]))
+            notes_on.append(note_id)
         elif event.data[1] == 0:
             if event.data[0] in notes_on:
-                notes_on.remove(event.data[0])
+                notes_on.remove(note_id)
             else:
                 print(
                     "Error! Note {0} not found at time {1}".format(
-                        event.data[0],
+                        note_id,
                         running_time))
         #converts ticks to microseconds, eliminates duplicate notes
         scroll_dict[running_time] = tuple(set(notes_on))
@@ -66,17 +65,17 @@ for time in sorted(scroll_dict.keys()):
     #convert back to relative time
     time -= running_time
     running_time += time
-    
+
     #reset all registers
     for i in range(8):
         registers[i] = 0b0
-    
+
     #set active notes
     for note in scroll_dict[time]:
         reg_num = note // 8
         reg_bit = note % 8
         registers[reg_num] += 2^reg_bit
-    
+
     scroll.append((time, registers))
 
 '''play scroll'''
