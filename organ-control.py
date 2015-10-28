@@ -43,7 +43,7 @@ for event in single_track:
         note_id = event.data[0] - 24
 
         if 128 > event.data[1] > 0:
-            #allows duplicates to prevent
+            #allows duplicates to prevent premature note cancellation
             notes_on.append((event.data[0]))
         elif event.data[1] == 0:
             if event.data[0] in notes_on:
