@@ -47,7 +47,7 @@ for event in single_track:
             #allows duplicates to prevent premature note cancellation
             notes_on.append(note_id)
         elif event.data[1] == 0:
-            if event.data[0] in notes_on:
+            if note_id in notes_on:
                 notes_on.remove(note_id)
             else:
                 print(
