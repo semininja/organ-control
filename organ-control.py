@@ -5,13 +5,13 @@ import sys
 import spidev
 import time as t
 
-'''import and convert file to absolute time'''
+"""import and convert file to absolute time"""
 midifile = sys.argv[1]
 pattern = midi.read_midifile(midifile)
 #absolute tick counts allow global sorting by time
 pattern.make_ticks_abs()
 
-'''combine all parts'''
+"""combine all parts"""
 single_track = midi.Track()
 for track in pattern:
     for event in track:
@@ -19,7 +19,7 @@ for track in pattern:
 #aforementioned global sort
 single_track.sort(key=lambda note: note.tick)
 
-'''reorganize as notes on at x time in microseconds'''
+"""reorganize as notes on at x time in microseconds"""
 notes_on = []
 scroll_dict = {}
 uspb = 50000 #microseconds per beat, default (120 bpm)
@@ -57,7 +57,7 @@ for event in single_track:
         #converts ticks to microseconds, eliminates duplicate notes
         scroll_dict[running_time] = tuple(set(notes_on))
 
-'''assemble 'piano roll' in preparation for output to horns'''
+"""assemble 'piano roll' in preparation for output to horns"""
 scroll = []
 registers = list(range(8))
 running_time = 0
@@ -76,9 +76,9 @@ for time in sorted(scroll_dict.keys()):
     time -= running_time
     running_time += time
 
-    scroll.append((time, registers))
+    scroll.append([time, registers[:]])
 
-'''play scroll'''
+"""play scroll"""
 spi = spidev.SpiDev()
 spi.open(0, 0)
 spi.max_speed_hz = int(5E4)
