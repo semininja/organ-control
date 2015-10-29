@@ -81,7 +81,7 @@ for time in sorted(scroll_dict.keys()):
 '''play scroll'''
 spi = spidev.SpiDev()
 spi.open(0, 0)
-spi.max_speed_hz = int(5E6)
+spi.max_speed_hz = int(5E4)
 #send notes
 for time, registers in scroll:
     t.sleep(time*1E-6)
