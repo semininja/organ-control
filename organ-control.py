@@ -74,7 +74,7 @@ for time in sorted(scroll_dict.keys()):
     for note in scroll_dict[time]:
         reg_num = note // 8
         reg_bit = note % 8
-        registers[reg_num] += 2^reg_bit
+        registers[reg_num] += 2**reg_bit
 
     #convert back to relative time
     time -= running_time
