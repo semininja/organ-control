@@ -95,5 +95,5 @@ def playfile(midifile):
 if __name__ == "__main__":
     midifile = sys.argv[1]
     print("Playing...")
-    play(midifile)
+    playfile(midifile)
     print("Done!")
