@@ -13,7 +13,7 @@ class Spi:
     
     def __enter__(self):
         self.spi.open(0, self.dev)
-        self.spi.max_speed_hz = 1E5
+        self.spi.max_speed_hz = int(1E5)
         print("SPI {} opened.".format(self.dev))
         return self.spi
     
