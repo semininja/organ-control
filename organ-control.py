@@ -14,12 +14,12 @@ class Spi:
     def __enter__(self):
         self.spi.open(0, self.dev)
         self.spi.max_speed_hz = 1E5
-        print("SPI {} opened.".format(self.dev)
+        print("SPI {} opened.".format(self.dev))
         return self.spi
     
     def __exit__(self):
         self.spi.close()
-        print("SPI {} closed.".format(self.dev)
+        print("SPI {} closed.".format(self.dev))
     
 def playfile(midifile):
     #convert file to absolute time
