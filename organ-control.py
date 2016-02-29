@@ -17,7 +17,7 @@ class Spi:
         print("SPI {} opened.".format(self.dev))
         return self.spi
     
-    def __exit__(self):
+    def __exit__(self, type, value, traceback):
         self.spi.close()
         print("SPI {} closed.".format(self.dev))
     
