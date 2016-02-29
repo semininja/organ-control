@@ -6,6 +6,21 @@ import time as t
 import midi
 import spidev
 
+class Spi:
+    def __init__(self, device=0):
+        self.spi = spidev.SpiDev()
+        self.dev = device
+    
+    def __enter__(self):
+        self.spi.open(0, self.dev)
+        self.spi.max_speed_hz = 1E5
+        print("SPI {} opened.".format(self.dev)
+        return self.spi
+    
+    def __exit__(self):
+        self.spi.close()
+        print("SPI {} closed.".format(self.dev)
+    
 def playfile(midifile):
     #convert file to absolute time
     pattern = midi.read_midifile(midifile)
@@ -55,7 +70,7 @@ def playfile(midifile):
                     notes_on.remove(note_id)
                 else:
                     print(
-                        "Error! Note {0} not found at time {1}".format(
+                        "Error! Note {} not found at time {}".format(
                             note_id,
                             running_time))
             #convert ticks to microseconds, eliminates duplicate notes
@@ -83,14 +98,10 @@ def playfile(midifile):
         scroll.append([time, registers[:]])
     
     #play scroll
-    spi = spidev.SpiDev()
-    spi.open(0, 0)
-    spi.max_speed_hz = int(1E5)
-    for time, registers in scroll:
-        t.sleep(time*1E-6)
-        spi.xfer2(registers)
-    
-    spi.close()
+    with Spi(0) as spi:
+        for time, registers in scroll:
+            t.sleep(time*1E-6)
+            spi.xfer2(registers)
 
 if __name__ == "__main__":
     midifile = sys.argv[1]
