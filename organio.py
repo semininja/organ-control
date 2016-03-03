@@ -7,6 +7,13 @@ import midi
 import spidev
 
 class Spi:
+    '''This class introduces support for 'with' use.
+    Spi handles setup, data rate; indicates device open and closed.
+    Usage is as follows:
+    
+    with Spi([devnum]) as devname:
+        #talk to devname
+    '''
     def __init__(self, device=0):
         self.spi = spidev.SpiDev()
         self.dev = device
@@ -22,6 +29,11 @@ class Spi:
         print("SPI {} closed.".format(self.dev))
     
 def playfile(midifile):
+    '''This method interprets a MIDI file and plays it on the organ.
+    Default tempo is 120 bpm, valid range is from 24 to 88. Notes out of range
+    are warned on the console and transposed into range.
+    Obviously, dynamics are not maintained.
+    '''
     #convert file to absolute time
     pattern = midi.read_midifile(midifile)
     #absolute tick counts allow global sorting by time
@@ -29,12 +41,10 @@ def playfile(midifile):
     
     #combine all parts
     single_track = midi.Track()
-    for track in pattern:
-        for event in track:
-            single_track.append(event)
+    single_track.extend([event for track in pattern for event in track])
     
     #aforementioned global sort
-    single_track.sort(key=lambda note: note.tick)
+    single_track.sort(key=lambda event: event.tick)
     
     #reorganize as notes on at x time in microseconds
     notes_on = []
@@ -60,6 +70,17 @@ def playfile(midifile):
     
             #convert from MIDI pitch to solenoid number
             note_id = event.data[0] - 24
+            if 0 <= note_id < 64:
+                pass
+            else:
+                tpos = 0
+                while note_id < 0:
+                    note_id += 12
+                    tpos += 1
+                while note_id >= 64:
+                    note_id -= 12
+                    tpos -= 1
+                print("Note transposed by {} octaves".format(tpos))
     
             if 128 > event.data[1] > 0:
                 #allow duplicates to prevent premature note cancellation
@@ -82,8 +103,7 @@ def playfile(midifile):
     running_time = 0
     for time in sorted(scroll_dict.keys()):
         #reset all registers
-        for i in range(8):
-            registers[i] = 0b0
+        registers = [0] * 8
     
         #set active notes
         for note in scroll_dict[time]:
