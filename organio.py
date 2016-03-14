@@ -105,7 +105,7 @@ def playfile(midifile):
 
 def live_play():
     with Spi(1) as inspi, Spi(0) as out:
-        invals = [0, 0, 0, 0, 0, 0, 0, 0]
+        invals = [0] * 8
         while True:
             inspi.xfer2([0])
             invals = out.xfer2(invals)
