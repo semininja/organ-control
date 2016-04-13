@@ -103,12 +103,13 @@ def playfile(midifile):
             t.sleep(time*1E-6)
             spi.xfer2(registers)
 
-def live_play():
+def live_play_test():
     with Spi(1) as inspi, Spi(0) as out:
         invals = [0] * 8
         while True:
             inspi.xfer2([0])
             invals = out.xfer2(invals)
+            print(invals)
 
 if __name__ == "__main__":
     midifile = sys.argv[1]
