@@ -105,6 +105,7 @@ def playfile(midifile):
 
 def live_play_test():
     with Spi(1) as inspi, Spi(0) as out:
+        inspi.cshigh = True
         invals = [0] * 8
         while True:
             inspi.xfer2([0])
