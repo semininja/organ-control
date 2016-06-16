@@ -6,6 +6,20 @@ import time as t
 import midi
 import spidev
 
+'''This module is created for use with electromechanical instruments.
+
+Supported hardware:
+    Control: Raspberry Pi
+        Interface: SPI bus
+    Input: SN74HC165
+    Output: SN74HC595
+
+Supported instruments:
+    Organ
+
+Playback filetype: MIDI
+'''
+
 class Spi:
     '''This class introduces support for 'with' use.
     Spi handles setup, data rate; indicates device open and closed.
@@ -28,8 +42,8 @@ class Spi:
         self.spi.close()
         print("SPI {} closed.".format(self.dev))
     
-def playfile(midifile):
-    '''This method interprets a MIDI file and plays it on the organ.
+def convert(midifile):
+    '''This method interprets a MIDI file and prepares it for playback.
     Default tempo is 120 bpm, valid range is from 24 to 88. Notes out of range
     are warned on the console and transposed into range.
     Obviously, dynamics are not maintained.
@@ -116,7 +130,10 @@ def playfile(midifile):
     
         scroll.append([time, registers[:]])
     
-    #play scroll
+    return scroll
+
+def play(scroll):
+    '''Basic playback set up for use with the organ.'''
     with Spi(0) as spi:
         for time, registers in scroll:
             t.sleep(time*1E-6)
@@ -125,5 +142,5 @@ def playfile(midifile):
 if __name__ == "__main__":
     midifile = sys.argv[1]
     print("Playing...")
-    playfile(midifile)
+    play(convert(midifile))
     print("Done!")
