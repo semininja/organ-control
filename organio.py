@@ -11,17 +11,24 @@ class Spi:
     Spi handles setup, data rate; indicates device open and closed.
     Usage is as follows:
     
-    with Spi([devnum]) as devname:
+    with Spi(device, devtype) as devname:
         #talk to devname
+    
+    Raspberry Pi supports devices 0 and 1, and supported device types are
+    'input', corresponding to SN74HC165, and 'output' (SN74HC595).
     '''
-    def __init__(self, device=0):
+    def __init__(self, device=0, devtype='input'):
         self.spi = spidev.SpiDev()
-        self.dev = device
+        self.devnum = device
+        self.devtype = devtype
     
     def __enter__(self):
-        self.spi.open(0, self.dev)
-        self.spi.max_speed_hz = int(1E5)
+        self.spi.open(0, self.devnum)
+        self.spi.max_speed_hz = int(50000)
         print("SPI {} opened.".format(self.dev))
+        if self.devtype = 'input':
+            self.spi.cshigh = True
+        
         return self.spi
     
     def __exit__(self, type, value, traceback):
@@ -123,8 +130,7 @@ def playfile(midifile):
             spi.xfer2(registers)
 
 def live_play_test():
-    with Spi(1) as inspi, Spi(0) as out:
-        inspi.cshigh = True
+    with Spi(1, 'input') as inspi, Spi(0) as out:
         invals = [0] * 8
         while True:
             inspi.xfer2([0])
