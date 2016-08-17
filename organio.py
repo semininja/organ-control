@@ -17,7 +17,7 @@ class Spi:
     Raspberry Pi supports devices 0 and 1, and supported device types are
     'input', corresponding to SN74HC165, and 'output' (SN74HC595).
     '''
-    def __init__(self, device=0, devtype='input'):
+    def __init__(self, device=0, devtype='output'):
         self.spi = spidev.SpiDev()
         self.devnum = device
         self.devtype = devtype
