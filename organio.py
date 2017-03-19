@@ -119,7 +119,7 @@ def convert(midifile):
         registers = [0] * 8
     
         #set active notes
-        for note in scroll_dict[time]:
+        for note in scroll_dict[event_time]:
             reg_num = note // 8
             reg_bit = note % 8
             registers[reg_num] += 2**reg_bit
@@ -128,7 +128,7 @@ def convert(midifile):
         event_time -= running_time
         running_time += event_time
     
-        scroll.append([time, registers[:]])
+        scroll.append([event_time, registers[:]])
     
     return scroll
 
