@@ -114,7 +114,7 @@ def convert(midifile):
     #assemble 'piano roll' in preparation for output to horns
     scroll = []
     running_time = 0
-    for time in sorted(scroll_dict.keys()):
+    for event_time in sorted(scroll_dict.keys()):
         #reset all registers
         registers = [0] * 8
     
