@@ -1,0 +1,3 @@
+organ-control
+py-spidev
+python-midi
